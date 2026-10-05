@@ -24,6 +24,16 @@ export function syncPlants(entries: EmotionEntry[], previous: Plant[] = []): Pla
   });
 }
 export function createEntry(emotion: Emotion, note: string, intensity: number, date = new Date().toISOString().slice(0, 10)): EmotionEntry { return { id: `emotion-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, date, emotion, note: note.trim() || EMOTION_META[emotion].hint, intensity: Math.min(5, Math.max(1, Number(intensity) || 3)) }; }
+export function filterEntries(entries: EmotionEntry[], emotion: Emotion | '全部', start: string, end: string): EmotionEntry[] {
+  const from = start && end && start > end ? end : start;
+  const to = start && end && start > end ? start : end;
+  return entries.filter((item) => (emotion === '全部' || item.emotion === emotion) && (!from || item.date >= from) && (!to || item.date <= to));
+}
+export function timelineStats(entries: EmotionEntry[]) {
+  const days = new Set(entries.map((item) => item.date)).size;
+  const intensity = entries.length ? entries.reduce((sum, item) => sum + item.intensity, 0) / entries.length : 0;
+  return { count: entries.length, days, intensity: Math.round(intensity * 10) / 10 };
+}
 export function annualReport(entries: EmotionEntry[]) {
   const counts = EMOTIONS.map((emotion) => ({ emotion, count: entries.filter((item) => item.emotion === emotion).length })).sort((a, b) => b.count - a.count);
   const active = new Set(entries.map((item) => item.date)).size;
