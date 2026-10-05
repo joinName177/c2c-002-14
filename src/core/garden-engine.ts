@@ -30,6 +30,13 @@ export function annualReport(entries: EmotionEntry[]) {
   const intensity = entries.length ? entries.reduce((sum, item) => sum + item.intensity, 0) / entries.length : 0;
   return { top: counts[0], counts, active, lushness: Math.min(100, Math.round((active / 90) * 70 + (intensity / 5) * 30)), intensity: Math.round(intensity * 10) / 10 };
 }
+export interface TimelineSummary { count: number; averageIntensity: number; coveredDays: number; }
+export function summarizeEntries(entries: EmotionEntry[]): TimelineSummary {
+  const count = entries.length;
+  const averageIntensity = count ? Math.round((entries.reduce((sum, item) => sum + item.intensity, 0) / count) * 10) / 10 : 0;
+  const coveredDays = new Set(entries.map((item) => item.date)).size;
+  return { count, averageIntensity, coveredDays };
+}
 export function sampleSnapshot(): GardenSnapshot {
   const today = new Date(); const entries: EmotionEntry[] = [];
   const seed: Emotion[] = ['喜悦', '喜悦', '平静', '平静', '平静', '平静', '喜悦', '忧伤', '焦虑', '平静', '喜悦'];
